@@ -1,11 +1,12 @@
 import google.generativeai as genai
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv()
 
 
-async def analytics_prompt(prompt):
+async def gemini_request(prompt):
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
     # Використовуємо доступну модель gemini-1.5-flash або gemini-pro
@@ -21,8 +22,16 @@ async def analytics_prompt(prompt):
     try:
         response = model.generate_content(prompt)
         response_text = response.text.strip()
-
-        return response_text
+        if response_text.startswith("```json"):
+            response_text = response_text.replace("```json", "", 1)
+        if response_text.endswith("```"):
+            response_text = response_text.rsplit("```", 1)[0]
+        response_text = response_text.strip()
+                
+        # Парсимо JSON
+        json_data = json.loads(response_text)
+        
+        return json_data
     except Exception as e:
         print(f"Помилка аналізу: {e}")
         return "Помилка аналізу"

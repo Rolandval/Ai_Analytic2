@@ -24,6 +24,7 @@ class Batteries(Base):
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String, nullable=False)
     c_amps = Column(Integer, nullable=False, default=0)
+    volume = Column(Float, nullable=True, default=0)
     region = Column(String, nullable=False, default="EUROPE")
     polarity = Column(String, nullable=False, default="R+")
     electrolyte = Column(String, nullable=False, default="LAB")
@@ -32,8 +33,8 @@ class Batteries(Base):
 
     # ORM-зв'язки
     brand = relationship("BatteriesBrands", back_populates="batteries")
-    prices = relationship("BatteriesPrices", back_populates="battery")
-    prices_current = relationship("BatteriesPricesCurrent", back_populates="battery")
+    prices = relationship("BatteriesPrices", back_populates="battery", cascade="all, delete-orphan")
+    prices_current = relationship("BatteriesPricesCurrent", back_populates="battery", cascade="all, delete-orphan")
 
 
 class BatteriesBrands(Base):
@@ -106,8 +107,8 @@ class SolarPanels(Base):
     
     # ORM-зв'язки
     brand = relationship("SolarPanelsBrands", back_populates="solar_panels")
-    prices = relationship("SolarPanelsPrices", back_populates="panel")
-    prices_current = relationship("SolarPanelsPricesCurrent", back_populates="panel")
+    prices = relationship("SolarPanelsPrices", back_populates="panel", cascade="all, delete-orphan")
+    prices_current = relationship("SolarPanelsPricesCurrent", back_populates="panel", cascade="all, delete-orphan")
 
 
 class SolarPanelsBrands(Base):
@@ -174,14 +175,14 @@ class Inverters(Base):
     inverter_type = Column(String, nullable=False, default="gybrid")
     generation = Column(String, nullable=False, default="4")
     string_count = Column(Integer, nullable=False, default=0)
-    firmware = Column(String, nullable=False, default="")
+    firmware = Column(String, nullable=True)
     
     brand_id = Column(Integer, ForeignKey('inverters_brands.id'), nullable=True)
     
     # ORM-зв'язки
     brand = relationship("InvertersBrands", back_populates="inverters")
-    prices = relationship("InvertersPrices", back_populates="inverter")
-    prices_current = relationship("InvertersPricesCurrent", back_populates="inverter")
+    prices = relationship("InvertersPrices", back_populates="inverter", cascade="all, delete-orphan")
+    prices_current = relationship("InvertersPricesCurrent", back_populates="inverter", cascade="all, delete-orphan")
 
 
 class InvertersBrands(Base):

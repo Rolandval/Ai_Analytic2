@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv
 from .models import Base
+from contextlib import asynccontextmanager
 
 # Завантаження змінних середовища
 load_dotenv(override=True)
@@ -22,9 +23,17 @@ SessionLocal = sessionmaker(
     class_=AsyncSession
 )
 
+@asynccontextmanager
 async def get_session() -> AsyncSession:
-    async with SessionLocal() as session:
+    session = SessionLocal()
+    try:
         yield session
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+    finally:
+        await session.close()
 
 async def create_tables():
     """Создает все таблицы в базе данных"""
@@ -36,4 +45,3 @@ async def init_db():
     
     # Создаем таблицы
     await create_tables()
-    

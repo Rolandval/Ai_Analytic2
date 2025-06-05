@@ -1,12 +1,10 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-import asyncio
+from fastapi import FastAPI
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from db.database import engine, init_db
 
-from db.database import SessionLocal, engine, init_db, get_session
+from services.batteries.router import router as batteries_router
 
 load_dotenv()
 
@@ -61,3 +59,6 @@ async def startup_db_client():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+app.include_router(batteries_router)
+
