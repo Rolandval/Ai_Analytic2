@@ -1,7 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.models import SolarPanels, SolarPanelsPricesCurrent, SolarPanelsPrices
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 from datetime import datetime
+from sqlalchemy.orm import joinedload
 
 
 async def create_solar_panel(session: AsyncSession = AsyncSession(), solar_panel: dict = {}):
@@ -26,21 +27,36 @@ async def create_solar_panel(session: AsyncSession = AsyncSession(), solar_panel
 
 async def update_solar_panels_prices(session: AsyncSession = AsyncSession(), solar_panel: dict = {}):
     try:
+        # Додаємо запис в історію цін
         new_solar_panel_price = SolarPanelsPrices(
             price=solar_panel['price'],
-            solar_panel_id=solar_panel['solar_panel_id'],
+            price_per_w=solar_panel['price_per_w'],
+            panel_id=solar_panel['panel_id'],
             supplier_id=solar_panel['supplier_id']
         )
         session.add(new_solar_panel_price)
         await session.flush()
 
-        current = await session.execute(select(SolarPanelsPricesCurrent).where(SolarPanelsPricesCurrent.solar_panel_id == solar_panel['solar_panel_id'], SolarPanelsPricesCurrent.supplier_id == solar_panel['supplier_id']))
-        if current.scalar_one_or_none():
-            await session.execute(update(SolarPanelsPricesCurrent).where(SolarPanelsPricesCurrent.solar_panel_id == solar_panel['solar_panel_id'], SolarPanelsPricesCurrent.supplier_id == solar_panel['supplier_id']).values(price=solar_panel['price'], updated_at=datetime.now()))
+        # Перевіряємо, чи існує запис в поточних цінах
+        stmt = select(SolarPanelsPricesCurrent).where(
+            SolarPanelsPricesCurrent.panel_id == solar_panel['panel_id'], 
+            SolarPanelsPricesCurrent.supplier_id == solar_panel['supplier_id']
+        )
+        result = await session.execute(stmt)
+        current_price = result.scalar_one_or_none()
+
+        # Якщо запис існує - оновлюємо ціну і дату
+        if current_price:
+            current_price.price = solar_panel['price']
+            current_price.price_per_w = solar_panel['price_per_w']
+            current_price.updated_at = datetime.now()
+            await session.flush()
         else:
+            # Якщо запису немає - створюємо новий
             new_solar_panel_price_current = SolarPanelsPricesCurrent(
                 price=solar_panel['price'],
-                solar_panel_id=solar_panel['solar_panel_id'],
+                price_per_w=solar_panel['price_per_w'],
+                panel_id=solar_panel['panel_id'],
                 supplier_id=solar_panel['supplier_id'],
                 updated_at=datetime.now()
             )
@@ -51,6 +67,7 @@ async def update_solar_panels_prices(session: AsyncSession = AsyncSession(), sol
 
     except Exception as e:
         print(e)
+
 
 
 async def delete_solar_panel(session: AsyncSession = AsyncSession(), solar_panel_id: int = 0):
@@ -64,13 +81,21 @@ async def delete_solar_panel(session: AsyncSession = AsyncSession(), solar_panel
             return "Solar panel not found"
     except Exception as e:
         print(e)
-    
+
 
 async def get_all_solar_panels(session: AsyncSession = AsyncSession()):
     try:
         solar_panels_data = []
-        solar_panels = await session.execute(select(SolarPanels))
-        data = solar_panels.scalars().all()
+        stmt = select(SolarPanels).options(joinedload(SolarPanels.brand))
+        result = await session.execute(stmt)
+        data = result.unique().scalars().all()
+        
+        if not data:
+            print("Не знайдено жодної сонячної панелі в базі даних!")
+            return []
+            
+        print(f"Знайдено {len(data)} сонячних панелей в базі даних")
+        
         for solar_panel in data:
             solar_panels_data.append({
                 "id": solar_panel.id,
@@ -80,13 +105,11 @@ async def get_all_solar_panels(session: AsyncSession = AsyncSession()):
                 "cell_type": solar_panel.cell_type,
                 "thickness": solar_panel.thickness,
                 "brand_id": solar_panel.brand_id,
-                "brand": solar_panel.brand.name,
+                "brand": solar_panel.brand.name if solar_panel.brand else None,
                 "panel_color": solar_panel.panel_color,
                 "frame_color": solar_panel.frame_color
             })
         return solar_panels_data
     except Exception as e:
-        print(e)
-    
-
-    
+        print(f"Помилка при отриманні сонячних панелей: {e}")
+        return []

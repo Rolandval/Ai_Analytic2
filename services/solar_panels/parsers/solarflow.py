@@ -103,9 +103,9 @@ async def extract_sollar_panels_html(session: aiohttp.ClientSession, links: List
     results = await asyncio.gather(*tasks)
     
     # Фільтруємо результати, видаляючи None
-    sollar_panels = [sollar_panel for sollar_panel in results if sollar_panel]
+    solar_panels = [sollar_panel for sollar_panel in results if sollar_panel]
     
-    return {"page_num": page_num, "sollar_panels": sollar_panels}
+    return {"page_num": page_num, "solar_panels": solar_panels}
 
 
 async def parse_solar_panels_solarflow() -> List[str]:

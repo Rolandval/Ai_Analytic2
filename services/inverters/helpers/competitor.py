@@ -28,6 +28,7 @@ async def get_competitors_ids(session: AsyncSession = AsyncSession()):
 
 
 async def get_competitors_name(func):
-    ...
+    if func.__name__ == "deye_ukraine":
+        return "Deye Ukraine"
 
     

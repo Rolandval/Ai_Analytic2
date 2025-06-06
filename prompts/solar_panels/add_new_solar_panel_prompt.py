@@ -10,7 +10,10 @@ def add_new_prompt(data):
         "price": price,
         "panel_type": panel_type,
         "cell_type": cell_type,
-        "thickness": thickness
+        "thickness": thickness,
+        "panel_color": panel_color,
+        "frame_color": frame_color,
+        "price_per_w": price_per_w
     }}
     де 
     - "brand": бренд
@@ -20,10 +23,12 @@ def add_new_prompt(data):
     - "panel_type": тип панелі (одностороння/двостороння)
     - "cell_type": тип комірок (n-type/p-type)
     - "thickness": товщина (мм)
+    - "panel_color": колір панелі (Default/All_Black)
+    - "frame_color": колір рамки (silver/black)
+    - "price_per_w": ціна за Вт/W
     
 
     твоє завдання - проаналізувати дані про сонячні панелі які я тобі відправлю та дізнатись як мені записати правильно дану панель в мою базу даних
-    але перш за все пропусти панель в якої хоча б одне поле є 0 або Null - їх видали
     всі які залишуться - то спробуй знайти в інтернеті правильні дані про модель і поверни мені JSON для запису її в такому форматі(не змінюй поле з ціною ніколи воно має залишитись таким як є!!!)
     {{
         "brand": brand,
@@ -34,7 +39,8 @@ def add_new_prompt(data):
         "cell_type": cell_type,
         "thickness": thickness,
         "panel_color": panel_color,
-        "frame_color": frame_color
+        "frame_color": frame_color,
+        "price_per_w": price_per_w
     }} 
     приклад:
     [
@@ -47,7 +53,8 @@ def add_new_prompt(data):
             "cell_type": "n-type",
             "thickness": 30.0,
             "panel_color": "Default",
-            "frame_color": "Silver"
+            "frame_color": "Silver",
+            "price_per_w": 0.33
         }}
     ]
 

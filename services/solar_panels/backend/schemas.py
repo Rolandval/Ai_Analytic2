@@ -14,8 +14,8 @@ class FrameColorEnum(str, Enum):
     
 
 class PanelTypeEnum(str, Enum):
-    first_side = "Одностороння"
-    second_side = "Двостороння"
+    first_side = "одностороння"
+    second_side = "двостороння"
 
 
 class CellTypeEnum(str, Enum):

@@ -8,6 +8,9 @@ load_dotenv()
 
 async def gemini_request(prompt):
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+#     grounding_tool = genai.Tool.from_google_search_retrieval(
+#     google_search_retrieval=genai.GoogleSearchRetrieval()
+# )
 
     # Використовуємо доступну модель gemini-1.5-flash або gemini-pro
     model = genai.GenerativeModel(
@@ -17,7 +20,8 @@ async def gemini_request(prompt):
             "top_p": 1,
             "top_k": 40,
             "max_output_tokens": 999999
-        }
+        },
+        # tools=[grounding_tool]
     )
     try:
         response = model.generate_content(prompt)

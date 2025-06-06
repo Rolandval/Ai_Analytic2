@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from db.models import SollarPanelsBrands
+from db.models import SolarPanelsBrands
 
 
 async def get_or_create_brand(session: AsyncSession = AsyncSession(), brand_name: str = "") -> int:    
@@ -9,14 +9,14 @@ async def get_or_create_brand(session: AsyncSession = AsyncSession(), brand_name
     
     brand_name_upper = brand_name.strip().upper()
     
-    query = select(SollarPanelsBrands).where(SollarPanelsBrands.name == brand_name_upper)
+    query = select(SolarPanelsBrands).where(SolarPanelsBrands.name == brand_name_upper)
     result = await session.execute(query)
     brand = result.scalar_one_or_none()
     
     if brand:
         return brand.id
     
-    new_brand = SollarPanelsBrands(name=brand_name_upper)
+    new_brand = SolarPanelsBrands(name=brand_name_upper)
     session.add(new_brand)
     await session.flush()
     return new_brand.id
@@ -28,6 +28,6 @@ async def get_brand_by_name(session: AsyncSession = AsyncSession(), brand_name: 
     
     brand_name_upper = brand_name.strip().upper()
     
-    query = select(SollarPanelsBrands).where(SollarPanelsBrands.name == brand_name_upper)
+    query = select(SolarPanelsBrands).where(SolarPanelsBrands.name == brand_name_upper)
     result = await session.execute(query)
     return result.scalar_one_or_none()

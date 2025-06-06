@@ -6,7 +6,8 @@ from services.solar_panels.exports.controllers import reports_import, parse_txt,
 from services.solar_panels.helpers.competitor import get_competitors_name
 
 
-from services.solar_panels.parsers import solarflow, friends_solar
+from services.solar_panels.parsers.solarflow import parse_solar_panels_solarflow
+from services.solar_panels.parsers.friends_solar import parse_solar_panels_friends_solar
 
 router = APIRouter(prefix="/upload", tags=["Upload/Export"])
 
@@ -68,8 +69,8 @@ async def upload_solar_panels_text(
 @router.post("/parse_competitors")
 async def parse_competitors_html():
     func_list =[]
-    func_list.append(solarflow)
-    func_list.append(friends_solar)
+    func_list.append(parse_solar_panels_solarflow)
+    func_list.append(parse_solar_panels_friends_solar)
     for func in func_list:
         supplier_name = await get_competitors_name(func)
         print(supplier_name)

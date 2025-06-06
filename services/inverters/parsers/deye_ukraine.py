@@ -13,7 +13,7 @@ from helpers.get_user_agent import get_headers
 
 
 def get_page_url(page: int) -> str:
-    return f"https://friendssolar.com.ua/g133828090-sonyachni-paneli/page_{page}?presence_available=true"
+    return f"https://www.deye-ukraine.com.ua/category/hybridinverter"
 
 
 async def fetch_html(session: aiohttp.ClientSession, url: str, page_num: int) -> Tuple[str, int]:
@@ -30,38 +30,27 @@ async def fetch_html(session: aiohttp.ClientSession, url: str, page_num: int) ->
         print(f"❌ Помилка на сторінці {page_num}: {e}")
         return "", page_num
 
+
 async def get_last_page() -> int:
-    headers = get_headers()
-    async with aiohttp.ClientSession(headers=headers) as session:
-        url = "https://friendssolar.com.ua/g133828090-sonyachni-paneli?presence_available=true"
-        html, _ = await fetch_html(session, url, 0)
-        soup = BeautifulSoup(html, 'html.parser')
-        pagination_div = soup.find("div", {
-                "class": "b-catalog-panel__pagination",
-            })
-        links_div = pagination_div.find("div", {"data-bazooka": "Paginator"})
-        page_count = links_div['data-pagination-pages-count']
+    return 1
 
-        if not page_count:
-            return 1
-        return int(page_count)
 
-def extract_sollar_panels_links_from_html(html: str) -> List[str]:
+def extract_inverters_links_from_html(html: str) -> List[str]:
     soup = BeautifulSoup(html, 'html.parser')
-    container = soup.find("ul", {
-                "class": "b-product-gallery",
+    container = soup.find("section", {
+                "data-hook": "product-list",
             })
     if not container:
         print("⚠️ Контейнер не знайдено")
         return []
-    solar_panels = container.find_all("li", class_="b-online-edit b-product-gallery__item js-productad")
-    solar_panels_links = []
-    for solar_panel in solar_panels:
-        link_div = solar_panel.find("a", class_="b-product-gallery__title")
-        solar_panels_links.append(link_div["href"])
-    return solar_panels_links
+    inverters = container.find_all("li")
+    inverters_links = []
+    for inverter in inverters:
+        link_div = inverter.find("a")
+        inverters_links.append(link_div["href"])
+    return inverters_links
 
-async def fetch_sollar_panel_details(session: aiohttp.ClientSession, url: str):
+async def fetch_inverter_details(session: aiohttp.ClientSession, url: str):
     """
     Асинхронно отримує детальну інформацію про акумулятор за посиланням
     """
@@ -74,76 +63,69 @@ async def fetch_sollar_panel_details(session: aiohttp.ClientSession, url: str):
             html = await response.text()
             soup = BeautifulSoup(html, 'html.parser')
             
-            solar_panel_details = soup.find("table", {
-                "class": "b-product-info",
+            inverter_details = soup.find("div", {
+                "data-hook": "info-section-description",
             })
-            price_div = soup.find("span", {
-                "data-qaid": "product_price",
+            price_div = soup.find("div", {
+                "data-hook": "product-price",
             })
-            name_lis = soup.find("span", {
-                "data-qaid": "product_name",
+            name_lis = soup.find("h1", {
+                "data-hook": "product-title",
             })
 
-            if solar_panel_details:
+            if inverter_details:
                 # Видалення зайвих пробілів з тексту в таблиці
-                for tag in solar_panel_details.find_all(text=True):
+                for tag in inverter_details.find_all(text=True):
                     if tag.strip():
                         tag.replace_with(tag.strip())
-            return [name_lis, price_div, solar_panel_details]
+            return [name_lis, price_div, inverter_details]
     except Exception as e:
         print(f"❌ Помилка при отриманні деталей {url}: {e}")
         return None
 
 
-async def extract_sollar_panels_html(session: aiohttp.ClientSession, links: List[str], page_num: int):
+async def extract_inverters_html(session: aiohttp.ClientSession, links: List[str], page_num: int):
     """
     Асинхронно отримує детальну інформацію про сонячні панелі за посиланнями
     """
-    sollar_panels = []
-    base_link = "https://friendssolar.com.ua"
+    inverters = []
     
     # Створюємо завдання для кожного посилання
     tasks = []
     for link in links:
-        full_link = f"{base_link}{link}"
-        tasks.append(fetch_sollar_panel_details(session, full_link))
+        tasks.append(fetch_inverter_details(session, link))
     
     # Виконуємо всі завдання асинхронно
     results = await asyncio.gather(*tasks)
     
     # Фільтруємо результати, видаляючи None
-    solar_panels = [sollar_panel for sollar_panel in results if sollar_panel]
+    inverters = [inverter for inverter in results if inverter]
     
-    return {"page_num": page_num, "solar_panels": solar_panels}
+    return {"page_num": page_num, "inverters": inverters}
 
 
-async def parse_solar_panels_friends_solar() -> List[str]:
+async def parse_inverters_deye_ukraine() -> List[str]:
     headers = get_headers()
     last_page = await get_last_page()
-    all_sollar_panels = []
+    all_inverters = []
 
     async with aiohttp.ClientSession(headers=headers) as session:
         tasks = []
         for i in range(1, last_page + 1):
             url = get_page_url(i)
             tasks.append(fetch_html(session, url, i))
-            await asyncio.sleep(random.uniform(0.1, 0.3))  # антиспам-пауза
+            await asyncio.sleep(random.uniform(5, 10))  # антиспам-пауза
 
         results = await asyncio.gather(*tasks)
 
         for html, page_num in results:
             if html:
-                solar_panels_links = extract_sollar_panels_links_from_html(html)
-                all_sollar_panels.append(await extract_sollar_panels_html(session, solar_panels_links, page_num))
+                inverters_links = extract_inverters_links_from_html(html)
+                all_inverters.append(await extract_inverters_html(session, inverters_links, page_num))
 
-    return all_sollar_panels
-
-
-
+    return all_inverters
 
 
 # if __name__ == "__main__":
-#     result = asyncio.run(parse_sollar_panels_friends_solar())
+#     result = asyncio.run(parse_inverters_deye_ukraine())
 #     print(result)
-
-        

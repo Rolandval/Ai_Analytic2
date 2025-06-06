@@ -7,7 +7,7 @@ async def get_or_create_competitor(session: AsyncSession = AsyncSession(), supli
     if not suplier_name:
         raise ValueError("Название поставщика не может быть пустым")
     
-    
+    suplier_name_upper = suplier_name.upper()
     
     query = select(SolarPanelsSuppliers).where(SolarPanelsSuppliers.name == suplier_name_upper)
     result = await session.execute(query)

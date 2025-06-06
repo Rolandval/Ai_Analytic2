@@ -2,10 +2,11 @@ from fastapi import APIRouter, HTTPException
 from fastapi import UploadFile
 import os
 import tempfile
-from helpers.csv_export import convert_to_csv
 from services.inverters.exports.controllers import reports_import, parse_txt, parse_my_inverters, parse_competitors
 from services.inverters.helpers.competitor import get_competitors_name
 
+
+from services.inverters.parsers.deye_ukraine import parse_inverters_deye_ukraine
 
 
 
@@ -69,7 +70,7 @@ async def upload_inverters_text(
 @router.post("/parse_competitors")
 async def parse_competitors_html():
     func_list =[]
-    
+    func_list.append(parse_inverters_deye_ukraine)
     for func in func_list:
         supplier_name = await get_competitors_name(func)
         print(supplier_name)

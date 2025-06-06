@@ -46,10 +46,11 @@ async def import_data(data, supplier_name, supplier_type):
         
         for item in all_data:
             print(f"item: {item}")
-            # Перевіряємо, чи є в item ключ 'battery_id' (для словників)
+            # Перевіряємо, чи є в item ключ 'panel_id' (для словників)
             if isinstance(item, dict) and item['panel_id']:
                 price_data.append({
                     "price": item['price'],
+                    "price_per_w": item['price_per_w'],
                     "panel_id": item['panel_id'],
                     "supplier_id": supplier_id
                 })
@@ -102,12 +103,15 @@ async def import_data(data, supplier_name, supplier_type):
                     # Додаємо ціну для нового акумулятора
                     if isinstance(item, dict):
                         price = item.get('price')
+                        price_per_w = item.get('price_per_w')
                     else:
                         price = getattr(item, 'price', 0)
+                        price_per_w = getattr(item, 'price_per_w', 0)
                     
                     if new_solar_panel and price:
                         await update_solar_panels_prices(session=session, solar_panel={
                             "price": price,
+                            "price_per_w": price_per_w,
                             "panel_id": new_solar_panel.id,
                             "supplier_id": supplier_id
                         })

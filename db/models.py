@@ -23,11 +23,11 @@ class Batteries(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String, nullable=False)
-    c_amps = Column(Integer, nullable=False, default=0)
-    volume = Column(Float, nullable=True, default=0)
+    c_amps = Column(Integer, nullable=True)
+    volume = Column(Float, nullable=True)
     region = Column(String, nullable=False, default="EUROPE")
     polarity = Column(String, nullable=False, default="R+")
-    electrolyte = Column(String, nullable=False, default="LAB")
+    electrolyte = Column(String, nullable=True)
 
     brand_id = Column(Integer, ForeignKey('batteries_brands.id'), nullable=True)    
 
@@ -97,15 +97,15 @@ class SolarPanels(Base):
     __tablename__ = "solar_panels"
 
     id = Column(Integer, primary_key=True, index=True)
-    power = Column(Float, nullable=False)
+    power = Column(Float, nullable=True)
     full_name = Column(String, nullable=False)
-    panel_type = Column(String, nullable=False, default="одностороння")
-    cell_type = Column(String, nullable=False, default="n-type")
-    thickness = Column(Float, nullable=False, default=30)
-    panel_color = Column(String, nullable=False, default="Default")
-    frame_color = Column(String, nullable=False, default="Silver")
+    panel_type = Column(String, nullable=True)
+    cell_type = Column(String, nullable=True)
+    thickness = Column(Float, nullable=True)
+    panel_color = Column(String, nullable=True)
+    frame_color = Column(String, nullable=True)
     
-    brand_id = Column(Integer, ForeignKey('solar_panels_brands.id'), nullable=True)
+    brand_id = Column(Integer, ForeignKey('solar_panels_brands.id'), nullable=False)
     
     # ORM-зв'язки
     brand = relationship("SolarPanelsBrands", back_populates="solar_panels")
@@ -141,6 +141,7 @@ class SolarPanelsPrices(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     price = Column(Float, nullable=False)
+    price_per_w = Column(Float, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     
     panel_id = Column(Integer, ForeignKey('solar_panels.id'), nullable=True)
@@ -157,6 +158,7 @@ class SolarPanelsPricesCurrent(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     price = Column(Float, nullable=False)
+    price_per_w = Column(Float, nullable=False)
     updated_at = Column(DateTime, nullable=False, default=datetime.now)
     
     panel_id = Column(Integer, ForeignKey('solar_panels.id'), nullable=True)
@@ -172,11 +174,11 @@ class Inverters(Base):
     __tablename__ = "inverters"
 
     id = Column(Integer, primary_key=True, index=True)
-    power = Column(Float, nullable=False)
+    power = Column(Float, nullable=True)
     full_name = Column(String, nullable=False)
-    inverter_type = Column(String, nullable=False, default="gybrid")
-    generation = Column(String, nullable=False, default="4")
-    string_count = Column(Integer, nullable=False, default=0)
+    inverter_type = Column(String, nullable=True)
+    generation = Column(String, nullable=True)
+    string_count = Column(Integer, nullable=True)
     firmware = Column(String, nullable=True)
     
     brand_id = Column(Integer, ForeignKey('inverters_brands.id'), nullable=True)
