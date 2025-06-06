@@ -34,6 +34,8 @@ async def get_prices_prompt(data, session):
     "cell_type": "n-type", <str>
     "thickness": 30.0, <float>
     "panel_id": null <null>
+    "panel_color": "Default", <str>
+    "frame_color": "Silver" <str>
 }}
 
 Використовуй для порівняння такі поля: `brand`, `power`, `panel_type`, `cell_type`, `thickness`, `full_name`. Співпадіння повинно бути максимально точним(окрім поля full_name)

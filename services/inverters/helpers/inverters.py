@@ -1,20 +1,19 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.models import Inverters, InvertersPricesCurrent, InvertersPrices
-from services.inverters.backend.schemas import InverterCreateSchema, InverterPriceSchema
 from sqlalchemy import select, update
 from datetime import datetime
 
 
-async def create_inverter(session: AsyncSession = AsyncSession(), inverter: InverterCreateSchema = {}):
+async def create_inverter(session: AsyncSession = AsyncSession(), inverter: dict = {}):
     try:
         new_inverter = Inverters(
-            full_name=inverter.full_name,
-            power=inverter.power,
-            inverter_type=inverter.inverter_type,
-            generation=inverter.generation,
-            string_count=inverter.string_count,
-            brand_id=inverter.brand_id,
-            firmware=inverter.firmware
+            full_name=inverter['full_name'],
+            power=inverter['power'],
+            inverter_type=inverter['inverter_type'],
+            generation=inverter['generation'],
+            string_count=inverter['string_count'],
+            brand_id=inverter['brand_id'],
+            firmware=inverter['firmware']
         )
         session.add(new_inverter)
         await session.flush()
@@ -24,24 +23,24 @@ async def create_inverter(session: AsyncSession = AsyncSession(), inverter: Inve
         print(e)
 
 
-async def update_inverters_prices(session: AsyncSession = AsyncSession(), inverter: InverterPriceSchema = {}):
+async def update_inverters_prices(session: AsyncSession = AsyncSession(), inverter: dict = {}):
     try:
         new_inverter_price = InvertersPrices(
-            price=inverter.price,
-            inverter_id=inverter.inverter_id,
-            supplier_id=inverter.supplier_id
+            price=inverter['price'],
+            inverter_id=inverter['inverter_id'],
+            supplier_id=inverter['supplier_id']
         )
         session.add(new_inverter_price)
         await session.flush()
 
-        current = await session.execute(select(InvertersPricesCurrent).where(InvertersPricesCurrent.inverter_id == inverter.inverter_id, InvertersPricesCurrent.supplier_id == inverter.supplier_id))
+        current = await session.execute(select(InvertersPricesCurrent).where(InvertersPricesCurrent.inverter_id == inverter['inverter_id'], InvertersPricesCurrent.supplier_id == inverter['supplier_id']))
         if current.scalar_one_or_none():
-            await session.execute(update(InvertersPricesCurrent).where(InvertersPricesCurrent.inverter_id == inverter.inverter_id, InvertersPricesCurrent.supplier_id == inverter.supplier_id).values(price=inverter.price, updated_at=datetime.now()))
+            await session.execute(update(InvertersPricesCurrent).where(InvertersPricesCurrent.inverter_id == inverter['inverter_id'], InvertersPricesCurrent.supplier_id == inverter['supplier_id']).values(price=inverter['price'], updated_at=datetime.now()))
         else:
             new_inverter_price_current = InvertersPricesCurrent(
-                price=inverter.price,
-                inverter_id=inverter.inverter_id,
-                supplier_id=inverter.supplier_id,
+                price=inverter['price'],
+                inverter_id=inverter['inverter_id'],
+                supplier_id=inverter['supplier_id'],
                 updated_at=datetime.now()
             )
             session.add(new_inverter_price_current)

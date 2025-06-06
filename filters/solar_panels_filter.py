@@ -34,6 +34,8 @@ def parse_chunk(index, data) -> List[Dict]:
 - "panel_type": тип панелі (одностороння/двостороння)
 - "cell_type": тип комірок (n-type/p-type)
 - "thickness": товщина (мм)
+- "panel_color": колір панелі - "Default" або "All_Black" (за замовчуванням "Default")
+- "frame_color": колір рамки - "Silver" або "Black" (за замовчуванням "Silver")
 
 🎯 Завдання:
 якщо поля full_name немає то пропусти цю панель і не повертай її!
@@ -59,6 +61,8 @@ def parse_chunk(index, data) -> List[Dict]:
 - "panel_type": panel_type
 - "cell_type": cell_type
 - "thickness": thickness(float)
+- "panel_color": panel_color
+- "frame_color": frame_color
 
 
 також якщо бачиш що якись з параметрів не передався, то пропускай цю панель

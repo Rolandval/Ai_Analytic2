@@ -12,7 +12,9 @@ def parse_txt_prompt(text, comment):
   "price": price,
   "panel_type": panel_type,
   "cell_type": cell_type,
-  "thickness": thickness
+  "thickness": thickness,
+  "panel_color": panel_color,
+  "frame_color": frame_color
 }}
 
 📌 Деталі парсингу:
@@ -23,6 +25,8 @@ def parse_txt_prompt(text, comment):
 - `panel_type`: тип панелі - "одностороння" або "двостороння" (за замовчуванням "одностороння")
 - `cell_type`: тип комірок - "n-type" або "p-type" (за замовчуванням "n-type")
 - `thickness`: товщина в міліметрах (мм) (за замовчуванням 30)
+- `panel_color`: колір панелі - "Default" або "All_Black" (за замовчуванням "Default")
+- `frame_color`: колір рамки - "Silver" або "Black" (за замовчуванням "Silver")
 {comment if comment else ""}
 
 

@@ -32,7 +32,9 @@ def add_new_prompt(data):
         "price": price,
         "panel_type": panel_type,
         "cell_type": cell_type,
-        "thickness": thickness
+        "thickness": thickness,
+        "panel_color": panel_color,
+        "frame_color": frame_color
     }} 
     приклад:
     [
@@ -43,7 +45,9 @@ def add_new_prompt(data):
             "price": 150.0,
             "panel_type": "одностороння",
             "cell_type": "n-type",
-            "thickness": 30.0
+            "thickness": 30.0,
+            "panel_color": "Default",
+            "frame_color": "Silver"
         }}
     ]
 

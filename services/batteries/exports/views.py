@@ -84,6 +84,7 @@ async def upload_batteries_file(
             raise HTTPException(status_code=500, detail=str(e))
 
 
+
 @router.post("/upload_reports")
 async def upload_batteries_file(
     doc_file: UploadFile | None = None,
@@ -137,6 +138,7 @@ async def upload_batteries_text(
 ):
     await parse_txt(text=text, supplier_name=supplier_name, comment=comment)
     return {"detail": "Import completed"}
+
 
 
 

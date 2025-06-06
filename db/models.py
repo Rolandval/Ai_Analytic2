@@ -102,6 +102,8 @@ class SolarPanels(Base):
     panel_type = Column(String, nullable=False, default="одностороння")
     cell_type = Column(String, nullable=False, default="n-type")
     thickness = Column(Float, nullable=False, default=30)
+    panel_color = Column(String, nullable=False, default="Default")
+    frame_color = Column(String, nullable=False, default="Silver")
     
     brand_id = Column(Integer, ForeignKey('solar_panels_brands.id'), nullable=True)
     

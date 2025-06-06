@@ -31,3 +31,5 @@ async def parse_my_batteries(parse_func, supplier_name):
     ai_data = await html_ai_parser(html_data)
     await import_data(ai_data, supplier_name, "me")
     return HTTPStatus.OK
+    
+    

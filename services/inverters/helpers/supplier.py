@@ -15,7 +15,7 @@ async def get_or_create_supplier(session: AsyncSession = AsyncSession(), suplier
     if suplier:
         return suplier.id
     
-    new_suplier = InvertersSuppliers(name=suplier_name_upper, is_me=False, is_supplier=True, is_competitor=False)
+    new_suplier = InvertersSuppliers(name=suplier_name_upper, status_id=2)
     session.add(new_suplier)
     await session.flush()  
     

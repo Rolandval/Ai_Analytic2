@@ -3,6 +3,15 @@ from typing import Optional
 from datetime import datetime
 from enum import Enum
 
+class PanelColorEnum(str, Enum):
+    default = "Default"
+    all_black = "All_Black"
+    
+
+class FrameColorEnum(str, Enum):
+    silver = "Silver"
+    black = "Black"
+    
 
 class PanelTypeEnum(str, Enum):
     first_side = "Одностороння"
@@ -21,6 +30,8 @@ class SolarPanelCreateSchema(BaseModel):
     cell_type: CellTypeEnum
     thickness: float
     brand_id: int
+    panel_color: PanelColorEnum
+    frame_color: FrameColorEnum
 
 class SolarPanelPriceSchema(BaseModel):
     price: float

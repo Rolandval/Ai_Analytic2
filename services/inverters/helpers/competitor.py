@@ -16,13 +16,13 @@ async def get_or_create_competitor(session: AsyncSession = AsyncSession(), supli
     if suplier:
         return suplier.id
     
-    new_suplier = InvertersSuppliers(name=suplier_name_upper, is_me=False, is_supplier=False, is_competitor=True)
+    new_suplier = InvertersSuppliers(name=suplier_name_upper, status_id=3)
     session.add(new_suplier)
     await session.flush()  
     return new_suplier.id
 
 async def get_competitors_ids(session: AsyncSession = AsyncSession()):
-    query = select(InvertersSuppliers).where(InvertersSuppliers.is_competitor == True)
+    query = select(InvertersSuppliers).where(InvertersSuppliers.status_id == 3)
     result = await session.execute(query)
     return [suplier.id for suplier in result.scalars()]
 

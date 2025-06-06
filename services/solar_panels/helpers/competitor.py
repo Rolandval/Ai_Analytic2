@@ -16,18 +16,20 @@ async def get_or_create_competitor(session: AsyncSession = AsyncSession(), supli
     if suplier:
         return suplier.id
     
-    new_suplier = SolarPanelsSuppliers(name=suplier_name_upper, is_me=False, is_supplier=False, is_competitor=True)
+    new_suplier = SolarPanelsSuppliers(name=suplier_name_upper, status_id=3)
     session.add(new_suplier)
     await session.flush()  
     return new_suplier.id
 
 async def get_competitors_ids(session: AsyncSession = AsyncSession()):
-    query = select(SolarPanelsSuppliers).where(SolarPanelsSuppliers.is_competitor == True)
+    query = select(SolarPanelsSuppliers).where(SolarPanelsSuppliers.status_id == 3)
     result = await session.execute(query)
     return [suplier.id for suplier in result.scalars()]
 
 
 async def get_competitors_name(func):
-    ...
-
+    if func.__name__ == "parse_solar_panels_solarflow":  
+        return "Solarflow"
+    if func.__name__ == "parse_solar_panels_friends_solar":  
+        return "Friends Solar"
     

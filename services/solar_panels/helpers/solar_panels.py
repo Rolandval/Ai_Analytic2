@@ -1,19 +1,20 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.models import SolarPanels, SolarPanelsPricesCurrent, SolarPanelsPrices
-from services.solar_panels.backend.schemas import SolarPanelCreateSchema, SolarPanelPriceSchema
 from sqlalchemy import select, update
 from datetime import datetime
 
 
-async def create_solar_panel(session: AsyncSession = AsyncSession(), solar_panel: SolarPanelCreateSchema = {}):
+async def create_solar_panel(session: AsyncSession = AsyncSession(), solar_panel: dict = {}):
     try:
         new_solar_panel = SolarPanels(
-            full_name=solar_panel.full_name,
-            power=solar_panel.power,
-            panel_type=solar_panel.panel_type,
-            cell_type=solar_panel.cell_type,
-            thickness=solar_panel.thickness,
-            brand_id=solar_panel.brand_id
+            full_name=solar_panel['full_name'],
+            power=solar_panel['power'],
+            panel_type=solar_panel['panel_type'],
+            cell_type=solar_panel['cell_type'],
+            thickness=solar_panel['thickness'],
+            brand_id=solar_panel['brand_id'],
+            panel_color=solar_panel['panel_color'],
+            frame_color=solar_panel['frame_color']
         )
         session.add(new_solar_panel)
         await session.flush()
@@ -23,24 +24,24 @@ async def create_solar_panel(session: AsyncSession = AsyncSession(), solar_panel
         print(e)
 
 
-async def update_solar_panels_prices(session: AsyncSession = AsyncSession(), solar_panel: SolarPanelPriceSchema = {}):
+async def update_solar_panels_prices(session: AsyncSession = AsyncSession(), solar_panel: dict = {}):
     try:
         new_solar_panel_price = SolarPanelsPrices(
-            price=solar_panel.price,
-            solar_panel_id=solar_panel.solar_panel_id,
-            supplier_id=solar_panel.supplier_id
+            price=solar_panel['price'],
+            solar_panel_id=solar_panel['solar_panel_id'],
+            supplier_id=solar_panel['supplier_id']
         )
         session.add(new_solar_panel_price)
         await session.flush()
 
-        current = await session.execute(select(SolarPanelsPricesCurrent).where(SolarPanelsPricesCurrent.solar_panel_id == solar_panel.solar_panel_id, SolarPanelsPricesCurrent.supplier_id == solar_panel.supplier_id))
+        current = await session.execute(select(SolarPanelsPricesCurrent).where(SolarPanelsPricesCurrent.solar_panel_id == solar_panel['solar_panel_id'], SolarPanelsPricesCurrent.supplier_id == solar_panel['supplier_id']))
         if current.scalar_one_or_none():
-            await session.execute(update(SolarPanelsPricesCurrent).where(SolarPanelsPricesCurrent.solar_panel_id == solar_panel.solar_panel_id, SolarPanelsPricesCurrent.supplier_id == solar_panel.supplier_id).values(price=solar_panel.price, updated_at=datetime.now()))
+            await session.execute(update(SolarPanelsPricesCurrent).where(SolarPanelsPricesCurrent.solar_panel_id == solar_panel['solar_panel_id'], SolarPanelsPricesCurrent.supplier_id == solar_panel['supplier_id']).values(price=solar_panel['price'], updated_at=datetime.now()))
         else:
             new_solar_panel_price_current = SolarPanelsPricesCurrent(
-                price=solar_panel.price,
-                solar_panel_id=solar_panel.solar_panel_id,
-                supplier_id=solar_panel.supplier_id,
+                price=solar_panel['price'],
+                solar_panel_id=solar_panel['solar_panel_id'],
+                supplier_id=solar_panel['supplier_id'],
                 updated_at=datetime.now()
             )
             session.add(new_solar_panel_price_current)
@@ -79,7 +80,9 @@ async def get_all_solar_panels(session: AsyncSession = AsyncSession()):
                 "cell_type": solar_panel.cell_type,
                 "thickness": solar_panel.thickness,
                 "brand_id": solar_panel.brand_id,
-                "brand": solar_panel.brand.name
+                "brand": solar_panel.brand.name,
+                "panel_color": solar_panel.panel_color,
+                "frame_color": solar_panel.frame_color
             })
         return solar_panels_data
     except Exception as e:
